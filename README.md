@@ -4,29 +4,23 @@ Backup and disaster recovery designed from recovery objectives outward. Tiered R
 
 | | |
 |---|---|
-| Project type | Independently built design and lab code. It generalizes professional work (tiered immutable backup for an audit; ASR failover testing and reporting for a CIO). No client data or configuration is included. |
+| Project type | Independently built design and lab code. It generalizes professional work in tiered immutable backup and ASR failover testing. No client data or configuration is included. |
 | Local validation | Bicep build and lint clean; 22 Pester tests pass; PSScriptAnalyzer clean ([evidence](docs/validation/README.md)) |
 | Cloud validation | Not yet deployed. No restore test or failover exercise has been run from this repository, so every RPO/RTO value here is a target, not a measurement. |
 
 ## Scenario: what's real and what this repo adds
 
-This repo combines two separate engagements I worked at an MSP, for two different clients, into one reference design. Client names and configuration are left out.
+This is a reference design built from my backup and disaster recovery work in production Azure environments. The environment here is fictional, and no real configuration is included.
 
-Client A, audit-driven backup hardening:
-- Set up immutable Recovery Services vaults, one per region in each subscription.
-- Rolled out VM backups and PostgreSQL backups (prod and dev) under a tiered model.
-- The client chose a 4-hour RPO for Tier 1 VMs (backups every 4 hours) over a 12-hour schedule.
-- Proposed long-term retention of 35 days / 12 weeks / 36 months / 10 years.
-- Documented gaps for the client to decide on, such as a serverless SQL database with auto-pause that had no long-term retention.
+What I've done in production:
+- Set up immutable Recovery Services vaults, one per region in each subscription, as part of an audit.
+- Rolled out VM and PostgreSQL backups (prod and dev) under a tiered model, including a 4-hour RPO for Tier 1 VMs (backups every 4 hours) and long-term retention of 35 days / 12 weeks / 36 months / 10 years.
+- Documented backup gaps for stakeholder decisions, such as a serverless SQL database with auto-pause that had no long-term retention.
+- Run Azure Site Recovery test failovers for VMs protected across two Recovery Services vaults, and wrote the runbook and the test report for leadership and the technical team. I'm the escalation contact when a test fails.
 
-Client B, disaster recovery testing:
-- Run Azure Site Recovery test failovers for VMs protected across two Recovery Services vaults.
-- Wrote the runbook and a report on how the test is performed, for the client's CIO and technical team.
-- Escalation contact when a test fails.
-
-Added for this repo, not part of either engagement:
-- One fictional environment (East US 2 primary, Central US secondary) that merges both designs.
-- The Tier 2-4 targets and methods. The Tier 1 schedule and the retention values come from Client A; here the retention values are applied to Tier 1 VMs.
+Added for this repo:
+- The environment itself (East US 2 primary, Central US secondary).
+- The Tier 2-4 targets and methods.
 - The Bicep for vaults and policies, auto-enrollment through Azure Policy with a `BackupTier` tag, and the immutability-lock script.
 - The DRX-01 regional failure exercise, the dependency map, the failback runbook, and `Get-AsrReadiness.ps1`.
 
