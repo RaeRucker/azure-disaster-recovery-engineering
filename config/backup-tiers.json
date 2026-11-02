@@ -1,0 +1,52 @@
+{
+  "$comment": "Backup tiers for Azure VMs. Deployed by infrastructure/main.bicep into every regional vault; validated by tests/DisasterRecovery.Tests.ps1. Values are examples: set them from the organization's data protection policy. rpoHours and rtoHours are TARGETS, not measured results.",
+  "tagName": "BackupTier",
+  "tiers": [
+    {
+      "name": "Tier1",
+      "label": "Critical: customer-facing, financial, identity",
+      "policyName": "pol-vm-tier1-4h",
+      "policyType": "V2",
+      "frequency": "Hourly",
+      "everyHours": 4,
+      "startTimeUtc": "04:00",
+      "windowHours": 24,
+      "instantRestoreDays": 7,
+      "retention": { "days": 35, "weeks": 12, "months": 36, "years": 10 },
+      "targets": { "rpoHours": 4, "rtoHours": 4, "recoveryMethod": "Azure Site Recovery failover (regional); instant restore (logical)" }
+    },
+    {
+      "name": "Tier2",
+      "label": "Important: internal line-of-business",
+      "policyName": "pol-vm-tier2-daily",
+      "policyType": "V1",
+      "frequency": "Daily",
+      "startTimeUtc": "05:00",
+      "instantRestoreDays": 5,
+      "retention": { "days": 30, "weeks": 12, "months": 12, "years": 0 },
+      "targets": { "rpoHours": 24, "rtoHours": 24, "recoveryMethod": "Cross Region Restore from the paired region" }
+    },
+    {
+      "name": "Tier3",
+      "label": "Standard: supporting services",
+      "policyName": "pol-vm-tier3-daily",
+      "policyType": "V1",
+      "frequency": "Daily",
+      "startTimeUtc": "06:00",
+      "instantRestoreDays": 2,
+      "retention": { "days": 30, "weeks": 4, "months": 0, "years": 0 },
+      "targets": { "rpoHours": 24, "rtoHours": 72, "recoveryMethod": "Cross Region Restore, or rebuild from IaC plus data restore" }
+    },
+    {
+      "name": "Tier4",
+      "label": "Non-production: dev and test",
+      "policyName": "pol-vm-tier4-daily",
+      "policyType": "V1",
+      "frequency": "Daily",
+      "startTimeUtc": "07:00",
+      "instantRestoreDays": 2,
+      "retention": { "days": 14, "weeks": 0, "months": 0, "years": 0 },
+      "targets": { "rpoHours": 24, "rtoHours": 168, "recoveryMethod": "Rebuild from IaC; restore only if needed" }
+    }
+  ]
+}

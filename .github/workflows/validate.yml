@@ -1,0 +1,49 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  bicep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - run: |
+          az bicep install
+          az bicep build --file infrastructure/main.bicep --stdout > /dev/null
+          az bicep lint --file infrastructure/main.bicep
+          for f in infrastructure/environments/*.bicepparam; do az bicep build-params --file "$f" --stdout > /dev/null; done
+
+  powershell:
+    name: PSScriptAnalyzer and Pester
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - run: |
+          curl -sSLo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+          chmod +x bicep && sudo mv bicep /usr/local/bin/bicep
+      - shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer, Pester -Force -Scope CurrentUser -SkipPublisherCheck
+          $f = @(Invoke-ScriptAnalyzer -Path ./scripts -Recurse -Severity Warning,Error) +
+               @(Invoke-ScriptAnalyzer -Path ./tests -Recurse -Severity Warning,Error -Settings ./tests/PSScriptAnalyzerSettings.psd1)
+          $f | Format-Table RuleName, ScriptName, Line, Message -Wrap
+          if ($f.Count) { throw "$($f.Count) analyzer findings" }
+          $c = New-PesterConfiguration
+          $c.Run.Path = './tests'; $c.Run.Exit = $true; $c.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $c
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz | tar xz gitleaks
+          ./gitleaks detect --source . --redact --verbose

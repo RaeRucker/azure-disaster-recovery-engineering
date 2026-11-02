@@ -1,0 +1,5 @@
+out/
+output/
+*.local.bicepparam
+testResults.xml
+.vscode/
