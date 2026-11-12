@@ -16,9 +16,9 @@
       "targets": { "rpoHours": 6, "rtoHours": 4, "recoveryMethod": "Azure Site Recovery failover (regional); instant restore (logical)" }
     },
     {
-      "name": "Important",
-      "label": "Important: internal line-of-business",
-      "policyName": "pol-vm-important-daily",
+      "name": "Business-Essential",
+      "label": "Business-Essential: internal apps the business needs day to day",
+      "policyName": "pol-vm-business-essential-daily",
       "policyType": "V1",
       "frequency": "Daily",
       "startTimeUtc": "05:00",
@@ -27,9 +27,9 @@
       "targets": { "rpoHours": 24, "rtoHours": 24, "recoveryMethod": "Cross Region Restore from the paired region" }
     },
     {
-      "name": "Supporting",
-      "label": "Standard: supporting services",
-      "policyName": "pol-vm-supporting-daily",
+      "name": "Operational",
+      "label": "Operational: supporting services such as file servers, jump boxes, and tooling",
+      "policyName": "pol-vm-operational-daily",
       "policyType": "V1",
       "frequency": "Daily",
       "startTimeUtc": "06:00",
@@ -38,9 +38,9 @@
       "targets": { "rpoHours": 24, "rtoHours": 72, "recoveryMethod": "Cross Region Restore, or rebuild from IaC plus data restore" }
     },
     {
-      "name": "NonProd",
-      "label": "Non-production: dev and test",
-      "policyName": "pol-vm-nonprod-daily",
+      "name": "Non-Production",
+      "label": "Non-Production: dev, test, and sandbox",
+      "policyName": "pol-vm-non-production-daily",
       "policyType": "V1",
       "frequency": "Daily",
       "startTimeUtc": "07:00",

@@ -5,7 +5,7 @@ Goal: a VM tagged `BackupTier = Critical` is automatically protected by the Crit
 ## How it fits together
 
 ```text
-VM created with tag BackupTier=Important
+VM created with tag BackupTier=Business-Essential
           │
           ▼
 Azure Policy assignment (one per tier per region)
@@ -13,7 +13,7 @@ Azure Policy assignment (one per tier per region)
    to an existing recovery services vault in the same location"
           │  DeployIfNotExists
           ▼
-VM protected in rsv-<sub>-<region> with pol-vm-important-daily
+VM protected in rsv-<sub>-<region> with pol-vm-business-essential-daily
 ```
 
 The built-in policy works per region, because a VM can only back up to a vault in its own region. You need one assignment for each tier × region pair.
@@ -22,7 +22,7 @@ The built-in policy works per region, because a VM can only back up to a vault i
 
 | Tag | Values |
 |---|---|
-| `BackupTier` | `Critical`, `Important`, `Supporting`, `NonProd` |
+| `BackupTier` | `Critical`, `Business-Essential`, `Operational`, `Non-Production` |
 
 To require the tag on new VMs, also assign the built-in policy Require a tag on resources (Deny), or Inherit a tag from the resource group if missing (Modify) if you set tiers at the resource group level.
 

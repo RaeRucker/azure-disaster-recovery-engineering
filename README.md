@@ -1,6 +1,6 @@
 # Azure Disaster Recovery Engineering
 
-Backup and disaster recovery designed from recovery objectives outward. Tiered RPO/RTO targets map to a recovery method per tier. Immutable, geo-redundant Recovery Services vaults and their tier policies (Critical, Important, Supporting, NonProd) are defined in Bicep. Azure Site Recovery handles failover for critical systems. Around that sit the runbooks, the dependency map, and a structured regional-failure exercise that turns the targets into measurements.
+Backup and disaster recovery designed from recovery objectives outward. Tiered RPO/RTO targets map to a recovery method per tier. Immutable, geo-redundant Recovery Services vaults and their tier policies (Critical, Business-Essential, Operational, Non-Production) are defined in Bicep. Azure Site Recovery handles failover for critical systems. Around that sit the runbooks, the dependency map, and a structured regional-failure exercise that turns the targets into measurements.
 
 | | |
 |---|---|
@@ -44,9 +44,9 @@ flowchart LR
 | Tier | RPO target | RTO target | Method | Backup policy |
 |---|---|---|---|---|
 | Critical | 6 h backup / minutes replication | 4 h | ASR failover + immutable backup | Enhanced, every 6 h; 30 d / 8 w / 24 m / 7 y |
-| Important | 24 h | 24 h | Cross Region Restore | Daily; 30 d / 8 w / 12 m |
-| Supporting | 24 h | 72 h | CRR or rebuild from IaC | Daily; 30 d / 4 w |
-| NonProd | 24 h | 1 week | Rebuild from IaC | Daily; 14 d |
+| Business-Essential | 24 h | 24 h | Cross Region Restore | Daily; 30 d / 8 w / 12 m |
+| Operational | 24 h | 72 h | CRR or rebuild from IaC | Daily; 30 d / 4 w |
+| Non-Production | 24 h | 1 week | Rebuild from IaC | Daily; 14 d |
 
 Why each tier uses its method, and why critical systems need both replication and backup: [docs/recovery-objectives.md](docs/recovery-objectives.md).
 
@@ -56,7 +56,7 @@ Why each tier uses its method, and why critical systems need both replication an
 flowchart TB
     subgraph PRI["Primary region (East US 2)"]
         VMS["Workload VMs<br/>tag BackupTier=&lt;tier&gt;"]
-        RSV1["rsv-&lt;scope&gt;-eastus2<br/>GRS, immutable, soft delete always on<br/>tier policies (Critical, Important, Supporting, NonProd)"]
+        RSV1["rsv-&lt;scope&gt;-eastus2<br/>GRS, immutable, soft delete always on<br/>tier policies (Critical, Business-Essential, Operational, Non-Production)"]
         VMS -- "backup (Azure Policy auto-enroll)" --> RSV1
     end
     subgraph SEC["Secondary region (Central US, Azure pair)"]
@@ -85,7 +85,7 @@ What happens when a dependency fails mid-recovery (VM won't boot, no capacity, D
 
 | Path | Purpose |
 |---|---|
-| [`infrastructure/main.bicep`](infrastructure/main.bicep) | Regional vault (GRS, CRR, immutability, soft delete, diagnostics) and VM backup policies for each tier (Critical, Important, Supporting, NonProd) |
+| [`infrastructure/main.bicep`](infrastructure/main.bicep) | Regional vault (GRS, CRR, immutability, soft delete, diagnostics) and VM backup policies for each tier (Critical, Business-Essential, Operational, Non-Production) |
 | [`config/backup-tiers.json`](config/backup-tiers.json) | Tier schedules, retention, and RPO/RTO targets |
 | [`docs/recovery-objectives.md`](docs/recovery-objectives.md) | Definitions, targets, regional versus logical failure |
 | [`docs/dependency-map.md`](docs/dependency-map.md) | Dependencies, recovery plan groups, failure handling |

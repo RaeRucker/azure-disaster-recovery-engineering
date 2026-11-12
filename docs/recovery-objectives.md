@@ -17,9 +17,9 @@ RTO counts the whole path: detection, the decision to fail over, the technical r
 | Tier | Workloads | RPO target | RTO target | Primary recovery method | Why this method |
 |---|---|---|---|---|---|
 | Critical | Customer-facing, financial, identity | 6 h (backup); minutes (ASR replication) | 4 h | Azure Site Recovery failover to the secondary region. Backup (every 6 hours, Enhanced policy) covers logical corruption. | Restoring many VMs from backup can't meet a 4 h RTO. Replication can. |
-| Important | Internal line-of-business | 24 h | 24 h | Cross Region Restore (CRR) from the GRS vault in the paired region | No replication cost; restore time fits the target |
-| Supporting | Supporting services | 24 h | 72 h | CRR, or rebuild from infrastructure as code plus a data restore | Rebuild is often faster and cleaner than restoring a whole VM |
-| NonProd | Dev and test | 24 h | 1 week | Rebuild from IaC | Data rarely needs recovery |
+| Business-Essential | Internal apps the business needs day to day | 24 h | 24 h | Cross Region Restore (CRR) from the GRS vault in the paired region | No replication cost; restore time fits the target |
+| Operational | Supporting services: file servers, jump boxes, tooling | 24 h | 72 h | CRR, or rebuild from infrastructure as code plus a data restore | Rebuild is often faster and cleaner than restoring a whole VM |
+| Non-Production | Dev, test, and sandbox | 24 h | 1 week | Rebuild from IaC | Data rarely needs recovery |
 
 Tier definitions and retention are in [`config/backup-tiers.json`](../config/backup-tiers.json). The tests check that RPO targets match each tier's backup frequency.
 
@@ -37,4 +37,4 @@ Critical systems therefore need both: ASR for the RTO, and immutable backups for
 - Paired region: GRS replicates to the region's Azure pair (for example East US 2 to Central US). CRR restores there. Check the pair for your primary region.
 - Capacity: a regional outage moves many customers to the same paired region at once. Deploy capacity reservations, or accept the risk that VM sizes may be unavailable during a large event.
 - Dependencies across regions: identity (domain controllers), DNS, Key Vault, and network connectivity must already exist in the secondary region, or recover first. See the [dependency map](dependency-map.md).
-- GRS replication lag: geo-replicated backup data trails the primary. Microsoft documents an RPO for CRR in hours, not minutes. Important-tier targets assume that.
+- GRS replication lag: geo-replicated backup data trails the primary. Microsoft documents an RPO for CRR in hours, not minutes. Business-Essential targets assume that.
