@@ -4,7 +4,7 @@ A backup that hasn't been restored is an assumption. This procedure proves that 
 
 ## Scope per run
 
-| Test | Platinum | Gold and Silver |
+| Test | Critical | Important and Supporting |
 |---|---|---|
 | Full VM restore to an isolated network | Every quarter | Every quarter, one VM per tier |
 | File-level restore | Every quarter | Every half year |

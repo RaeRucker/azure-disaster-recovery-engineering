@@ -7,7 +7,7 @@
 | Type | Test failover (non-disruptive: production keeps running) |
 | Scope | Order processing application: DC (standing replica), SQL, 2 app servers, web tier |
 | Primary → secondary | East US 2 → Central US |
-| Targets under test | Platinum: RTO 4 h, RPO 6 h ([recovery objectives](../../docs/recovery-objectives.md)) |
+| Targets under test | Critical: RTO 4 h, RPO 6 h ([recovery objectives](../../docs/recovery-objectives.md)) |
 | Duration | Half a day, including cleanup |
 
 ## Objectives
@@ -24,7 +24,7 @@
 | P1 | All protected VMs replication health *Healthy*, no open test failovers | `scripts/Get-AsrReadiness.ps1` output = READY |
 | P2 | Isolated test VNet in the secondary region, not peered to production | VNet peerings list (empty) |
 | P3 | A standing DC exists in the test VNet, or a DC test-failover copy is planned (isolated only) | |
-| P4 | Latest Platinum backup restore test is under 90 days old | Restore test record ([runbook](../../runbooks/backup-restore-validation.md)) |
+| P4 | Latest Critical-tier backup restore test is under 90 days old | Restore test record ([runbook](../../runbooks/backup-restore-validation.md)) |
 | P5 | Business owner approved the window. Application owners available for validation. | Change record |
 | P6 | Rollback (cleanup) procedure reviewed | This document, *Cleanup* |
 

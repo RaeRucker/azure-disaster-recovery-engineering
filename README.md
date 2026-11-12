@@ -1,6 +1,6 @@
 # Azure Disaster Recovery Engineering
 
-Backup and disaster recovery designed from recovery objectives outward. Tiered RPO/RTO targets map to a recovery method per tier. Immutable, geo-redundant Recovery Services vaults and their Platinum through Bronze policies are defined in Bicep. Azure Site Recovery handles Platinum failover. Around that sit the runbooks, the dependency map, and a structured regional-failure exercise that turns the targets into measurements.
+Backup and disaster recovery designed from recovery objectives outward. Tiered RPO/RTO targets map to a recovery method per tier. Immutable, geo-redundant Recovery Services vaults and their tier policies (Critical, Important, Supporting, NonProd) are defined in Bicep. Azure Site Recovery handles failover for critical systems. Around that sit the runbooks, the dependency map, and a structured regional-failure exercise that turns the targets into measurements.
 
 | | |
 |---|---|
@@ -43,12 +43,12 @@ flowchart LR
 
 | Tier | RPO target | RTO target | Method | Backup policy |
 |---|---|---|---|---|
-| Platinum | 6 h backup / minutes replication | 4 h | ASR failover + immutable backup | Enhanced, every 6 h; 30 d / 8 w / 24 m / 7 y |
-| Gold | 24 h | 24 h | Cross Region Restore | Daily; 30 d / 8 w / 12 m |
-| Silver | 24 h | 72 h | CRR or rebuild from IaC | Daily; 30 d / 4 w |
-| Bronze | 24 h | 1 week | Rebuild from IaC | Daily; 14 d |
+| Critical | 6 h backup / minutes replication | 4 h | ASR failover + immutable backup | Enhanced, every 6 h; 30 d / 8 w / 24 m / 7 y |
+| Important | 24 h | 24 h | Cross Region Restore | Daily; 30 d / 8 w / 12 m |
+| Supporting | 24 h | 72 h | CRR or rebuild from IaC | Daily; 30 d / 4 w |
+| NonProd | 24 h | 1 week | Rebuild from IaC | Daily; 14 d |
 
-Why each tier uses its method, and why Platinum needs both replication and backup: [docs/recovery-objectives.md](docs/recovery-objectives.md).
+Why each tier uses its method, and why critical systems need both replication and backup: [docs/recovery-objectives.md](docs/recovery-objectives.md).
 
 ## Architecture
 
@@ -56,16 +56,16 @@ Why each tier uses its method, and why Platinum needs both replication and backu
 flowchart TB
     subgraph PRI["Primary region (East US 2)"]
         VMS["Workload VMs<br/>tag BackupTier=&lt;tier&gt;"]
-        RSV1["rsv-&lt;scope&gt;-eastus2<br/>GRS, immutable, soft delete always on<br/>Platinum through Bronze policies"]
+        RSV1["rsv-&lt;scope&gt;-eastus2<br/>GRS, immutable, soft delete always on<br/>tier policies (Critical, Important, Supporting, NonProd)"]
         VMS -- "backup (Azure Policy auto-enroll)" --> RSV1
     end
     subgraph SEC["Secondary region (Central US, Azure pair)"]
         GRS["Geo-replicated backup data<br/>(Cross Region Restore)"]
         RSV2["rsv-&lt;scope&gt;-centralus<br/>(protects secondary workloads)"]
-        REP["ASR replicas<br/>Platinum only"]
+        REP["ASR replicas<br/>Critical tier only"]
     end
     RSV1 -- "GRS replication" --> GRS
-    VMS -- "ASR continuous replication (Platinum)" --> REP
+    VMS -- "ASR continuous replication (Critical tier)" --> REP
     RSV1 & RSV2 -- "AddonAzureBackup* logs" --> LAW["Log Analytics<br/>alerts + backup report"]
 ```
 
@@ -85,7 +85,7 @@ What happens when a dependency fails mid-recovery (VM won't boot, no capacity, D
 
 | Path | Purpose |
 |---|---|
-| [`infrastructure/main.bicep`](infrastructure/main.bicep) | Regional vault (GRS, CRR, immutability, soft delete, diagnostics) and Platinum through Bronze VM policies |
+| [`infrastructure/main.bicep`](infrastructure/main.bicep) | Regional vault (GRS, CRR, immutability, soft delete, diagnostics) and VM backup policies for each tier (Critical, Important, Supporting, NonProd) |
 | [`config/backup-tiers.json`](config/backup-tiers.json) | Tier schedules, retention, and RPO/RTO targets |
 | [`docs/recovery-objectives.md`](docs/recovery-objectives.md) | Definitions, targets, regional versus logical failure |
 | [`docs/dependency-map.md`](docs/dependency-map.md) | Dependencies, recovery plan groups, failure handling |
@@ -108,7 +108,7 @@ for region in eastus2 centralus; do
 done
 ```
 
-Then: enable auto-enrollment ([guide](docs/auto-enroll-with-azure-policy.md)), configure ASR replication and the `rp-orders` recovery plan for Platinum VMs, run a [restore validation](runbooks/backup-restore-validation.md), and only then [lock immutability](scripts/Lock-VaultImmutability.ps1).
+Then: enable auto-enrollment ([guide](docs/auto-enroll-with-azure-policy.md)), configure ASR replication and the `rp-orders` recovery plan for Critical-tier VMs, run a [restore validation](runbooks/backup-restore-validation.md), and only then [lock immutability](scripts/Lock-VaultImmutability.ps1).
 
 Required roles: Backup Contributor (vaults, policies), Site Recovery Contributor (ASR), Resource Policy Contributor (auto-enrollment).
 
@@ -128,7 +128,7 @@ Immutability and always-on soft delete protect recovery points from deletion by 
 
 ## Cost considerations
 
-Charges come from backup protected-instance fees (per VM, by size band), backup storage (GRS, roughly twice LRS; long yearly retention dominates over time), ASR per-instance fees for Platinum plus replica disks and cache storage, and restore-test compute and disks (short-lived). Retention is the biggest long-term lever: 10-year yearly points for Platinum add up. Set them from a real requirement. Teardown: unlocked vaults can be deleted after stopping protection and deleting backup data, and soft delete keeps that data for 14 more days. Locked vaults can't have retention reduced. Don't lock lab vaults.
+Charges come from backup protected-instance fees (per VM, by size band), backup storage (GRS, roughly twice LRS; long yearly retention dominates over time), ASR per-instance fees for the Critical tier plus replica disks and cache storage, and restore-test compute and disks (short-lived). Retention is the biggest long-term lever: 10-year yearly points for Critical add up. Set them from a real requirement. Teardown: unlocked vaults can be deleted after stopping protection and deleting backup data, and soft delete keeps that data for 14 more days. Locked vaults can't have retention reduced. Don't lock lab vaults.
 
 ## Limitations and known gaps
 

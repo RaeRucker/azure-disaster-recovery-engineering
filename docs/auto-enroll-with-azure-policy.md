@@ -1,11 +1,11 @@
 # Auto-enroll VMs into the right backup tier with Azure Policy
 
-Goal: a VM tagged `BackupTier = Platinum` is automatically protected by the Platinum policy in its region's vault, with nobody clicking Enable backup. Untagged VMs show up as non-compliant, so gaps are visible.
+Goal: a VM tagged `BackupTier = Critical` is automatically protected by the Critical policy in its region's vault, with nobody clicking Enable backup. Untagged VMs show up as non-compliant, so gaps are visible.
 
 ## How it fits together
 
 ```text
-VM created with tag BackupTier=Gold
+VM created with tag BackupTier=Important
           │
           ▼
 Azure Policy assignment (one per tier per region)
@@ -13,7 +13,7 @@ Azure Policy assignment (one per tier per region)
    to an existing recovery services vault in the same location"
           │  DeployIfNotExists
           ▼
-VM protected in rsv-<sub>-<region> with pol-vm-gold-daily
+VM protected in rsv-<sub>-<region> with pol-vm-important-daily
 ```
 
 The built-in policy works per region, because a VM can only back up to a vault in its own region. You need one assignment for each tier × region pair.
@@ -22,7 +22,7 @@ The built-in policy works per region, because a VM can only back up to a vault i
 
 | Tag | Values |
 |---|---|
-| `BackupTier` | `Platinum`, `Gold`, `Silver`, `Bronze` |
+| `BackupTier` | `Critical`, `Important`, `Supporting`, `NonProd` |
 
 To require the tag on new VMs, also assign the built-in policy Require a tag on resources (Deny), or Inherit a tag from the resource group if missing (Modify) if you set tiers at the resource group level.
 
@@ -31,12 +31,12 @@ To require the tag on new VMs, also assign the built-in policy Require a tag on 
 1. In the Azure portal, open Policy → Authoring → Definitions.
 2. Filter Category = Backup and open Configure backup on virtual machines with a given tag to an existing recovery services vault in the same location.
 3. Select Assign.
-4. Basics: set the scope to the subscription. Name the assignment `backup-<tier>-<region>`, for example `backup-platinum-eastus`.
+4. Basics: set the scope to the subscription. Name the assignment `backup-<tier>-<region>`, for example `backup-critical-eastus`.
 5. Parameters:
    - Location of VMs: the region, for example `eastus`
    - Inclusion tag name: `BackupTier`
-   - Inclusion tag values: `Platinum`
-   - Backup policy: pick `pol-vm-platinum-6h` from that region's vault
+   - Inclusion tag values: `Critical`
+   - Backup policy: pick `pol-vm-critical-6h` from that region's vault
 6. Remediation: check Create a remediation task so existing tagged VMs get enrolled too, and keep Create a Managed Identity checked.
 7. Review + create.
 

@@ -3,9 +3,9 @@
   "tagName": "BackupTier",
   "tiers": [
     {
-      "name": "Platinum",
+      "name": "Critical",
       "label": "Critical: customer-facing, financial, identity",
-      "policyName": "pol-vm-platinum-6h",
+      "policyName": "pol-vm-critical-6h",
       "policyType": "V2",
       "frequency": "Hourly",
       "everyHours": 6,
@@ -16,9 +16,9 @@
       "targets": { "rpoHours": 6, "rtoHours": 4, "recoveryMethod": "Azure Site Recovery failover (regional); instant restore (logical)" }
     },
     {
-      "name": "Gold",
+      "name": "Important",
       "label": "Important: internal line-of-business",
-      "policyName": "pol-vm-gold-daily",
+      "policyName": "pol-vm-important-daily",
       "policyType": "V1",
       "frequency": "Daily",
       "startTimeUtc": "05:00",
@@ -27,9 +27,9 @@
       "targets": { "rpoHours": 24, "rtoHours": 24, "recoveryMethod": "Cross Region Restore from the paired region" }
     },
     {
-      "name": "Silver",
+      "name": "Supporting",
       "label": "Standard: supporting services",
-      "policyName": "pol-vm-silver-daily",
+      "policyName": "pol-vm-supporting-daily",
       "policyType": "V1",
       "frequency": "Daily",
       "startTimeUtc": "06:00",
@@ -38,9 +38,9 @@
       "targets": { "rpoHours": 24, "rtoHours": 72, "recoveryMethod": "Cross Region Restore, or rebuild from IaC plus data restore" }
     },
     {
-      "name": "Bronze",
+      "name": "NonProd",
       "label": "Non-production: dev and test",
-      "policyName": "pol-vm-bronze-daily",
+      "policyName": "pol-vm-nonprod-daily",
       "policyType": "V1",
       "frequency": "Daily",
       "startTimeUtc": "07:00",

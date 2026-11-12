@@ -2,8 +2,8 @@
 
 Status: Accepted
 
-Decision. Platinum uses Azure Site Recovery (continuous replication, recovery plans), plus immutable backup for logical corruption. Gold and Silver use backup with Cross Region Restore. Bronze is rebuilt from IaC.
+Decision. Critical systems use Azure Site Recovery (continuous replication, recovery plans), plus immutable backup for logical corruption. Important and supporting systems use backup with Cross Region Restore. NonProd is rebuilt from IaC.
 
-Rationale. Restoring a set of dependent VMs from backup takes hours and is serialized by operator effort. That can't meet a 4 h RTO for a multi-tier app. Replication can, at the cost of per-VM ASR licensing, cache storage, and replica disks. Paying that for every VM would be wasteful. Replication also doesn't protect against logical failures (it copies them), so Platinum keeps backups too.
+Rationale. Restoring a set of dependent VMs from backup takes hours and is serialized by operator effort. That can't meet a 4 h RTO for a multi-tier app. Replication can, at the cost of per-VM ASR licensing, cache storage, and replica disks. Paying that for every VM would be wasteful. Replication also doesn't protect against logical failures (it copies them), so Critical keeps backups too.
 
 Consequences. Two recovery mechanisms to test. DRX-01 covers ASR; the restore validation runbook covers backup.
