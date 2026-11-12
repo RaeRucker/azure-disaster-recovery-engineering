@@ -7,7 +7,7 @@
 | Type | Test failover (non-disruptive: production keeps running) |
 | Scope | Order processing application: DC (standing replica), SQL, 2 app servers, web tier |
 | Primary → secondary | East US 2 → Central US |
-| Targets under test | Tier 1: RTO 4 h, RPO 4 h ([recovery objectives](../../docs/recovery-objectives.md)) |
+| Targets under test | Tier 1: RTO 4 h, RPO 6 h ([recovery objectives](../../docs/recovery-objectives.md)) |
 | Duration | Half a day, including cleanup |
 
 ## Objectives

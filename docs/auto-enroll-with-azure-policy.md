@@ -36,7 +36,7 @@ To require the tag on new VMs, also assign the built-in policy Require a tag on 
    - Location of VMs: the region, for example `eastus`
    - Inclusion tag name: `BackupTier`
    - Inclusion tag values: `Tier1`
-   - Backup policy: pick `pol-vm-tier1-4h` from that region's vault
+   - Backup policy: pick `pol-vm-tier1-6h` from that region's vault
 6. Remediation: check Create a remediation task so existing tagged VMs get enrolled too, and keep Create a Managed Identity checked.
 7. Review + create.
 

@@ -13,14 +13,14 @@ Backup and disaster recovery designed from recovery objectives outward. Tiered R
 This is a reference design built from my backup and disaster recovery work in production Azure environments. The environment here is fictional, and no real configuration is included.
 
 What I've done in production:
-- Set up immutable Recovery Services vaults, one per region in each subscription, as part of an audit.
-- Rolled out VM and PostgreSQL backups (prod and dev) under a tiered model, including a 4-hour RPO for Tier 1 VMs (backups every 4 hours) and long-term retention of 35 days / 12 weeks / 36 months / 10 years.
-- Documented backup gaps for stakeholder decisions, such as a serverless SQL database with auto-pause that had no long-term retention.
+- Set up immutable Recovery Services vaults per region and subscription.
+- Rolled out VM and database backups under a tiered model, with backup frequency and long-term retention set by criticality.
+- Documented backup coverage gaps and exceptions for stakeholder decisions.
 - Run Azure Site Recovery test failovers for VMs protected across two Recovery Services vaults, and wrote the runbook and the test report for leadership and the technical team. I'm the escalation contact when a test fails.
 
 Added for this repo:
 - The environment itself (East US 2 primary, Central US secondary).
-- The Tier 2-4 targets and methods.
+- The tier model below: its schedules, retention, RPO/RTO targets, and recovery methods are example values for this design.
 - The Bicep for vaults and policies, auto-enrollment through Azure Policy with a `BackupTier` tag, and the immutability-lock script.
 - The DRX-01 regional failure exercise, the dependency map, the failback runbook, and `Get-AsrReadiness.ps1`.
 
@@ -43,8 +43,8 @@ flowchart LR
 
 | Tier | RPO target | RTO target | Method | Backup policy |
 |---|---|---|---|---|
-| 1 | 4 h backup / minutes replication | 4 h | ASR failover + immutable backup | Enhanced, every 4 h; 35 d / 12 w / 36 m / 10 y |
-| 2 | 24 h | 24 h | Cross Region Restore | Daily; 30 d / 12 w / 12 m |
+| 1 | 6 h backup / minutes replication | 4 h | ASR failover + immutable backup | Enhanced, every 6 h; 30 d / 8 w / 24 m / 7 y |
+| 2 | 24 h | 24 h | Cross Region Restore | Daily; 30 d / 8 w / 12 m |
 | 3 | 24 h | 72 h | CRR or rebuild from IaC | Daily; 30 d / 4 w |
 | 4 | 24 h | 1 week | Rebuild from IaC | Daily; 14 d |
 

@@ -5,15 +5,15 @@
     {
       "name": "Tier1",
       "label": "Critical: customer-facing, financial, identity",
-      "policyName": "pol-vm-tier1-4h",
+      "policyName": "pol-vm-tier1-6h",
       "policyType": "V2",
       "frequency": "Hourly",
-      "everyHours": 4,
+      "everyHours": 6,
       "startTimeUtc": "04:00",
       "windowHours": 24,
       "instantRestoreDays": 7,
-      "retention": { "days": 35, "weeks": 12, "months": 36, "years": 10 },
-      "targets": { "rpoHours": 4, "rtoHours": 4, "recoveryMethod": "Azure Site Recovery failover (regional); instant restore (logical)" }
+      "retention": { "days": 30, "weeks": 8, "months": 24, "years": 7 },
+      "targets": { "rpoHours": 6, "rtoHours": 4, "recoveryMethod": "Azure Site Recovery failover (regional); instant restore (logical)" }
     },
     {
       "name": "Tier2",
@@ -23,7 +23,7 @@
       "frequency": "Daily",
       "startTimeUtc": "05:00",
       "instantRestoreDays": 5,
-      "retention": { "days": 30, "weeks": 12, "months": 12, "years": 0 },
+      "retention": { "days": 30, "weeks": 8, "months": 12, "years": 0 },
       "targets": { "rpoHours": 24, "rtoHours": 24, "recoveryMethod": "Cross Region Restore from the paired region" }
     },
     {

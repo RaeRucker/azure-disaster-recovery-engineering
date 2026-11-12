@@ -5,7 +5,7 @@
 | Measure | Target | Measured | Met? |
 |---|---|---|---|
 | RTO (T0 to V1 pass) | 4 h | | |
-| RPO (T0 minus newest recovered transaction) | 4 h | | |
+| RPO (T0 minus newest recovered transaction) | 6 h | | |
 | Failover job duration (recovery plan) | n/a | | |
 
 ## Timeline

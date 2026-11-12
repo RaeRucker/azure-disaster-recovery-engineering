@@ -16,7 +16,7 @@ RTO counts the whole path: detection, the decision to fail over, the technical r
 
 | Tier | Workloads | RPO target | RTO target | Primary recovery method | Why this method |
 |---|---|---|---|---|---|
-| 1 | Customer-facing, financial, identity | 4 h (backup); minutes (ASR replication) | 4 h | Azure Site Recovery failover to the secondary region. Backup (4-hourly, Enhanced policy) covers logical corruption. | Restoring many VMs from backup can't meet a 4 h RTO. Replication can. |
+| 1 | Customer-facing, financial, identity | 6 h (backup); minutes (ASR replication) | 4 h | Azure Site Recovery failover to the secondary region. Backup (every 6 hours, Enhanced policy) covers logical corruption. | Restoring many VMs from backup can't meet a 4 h RTO. Replication can. |
 | 2 | Internal line-of-business | 24 h | 24 h | Cross Region Restore (CRR) from the GRS vault in the paired region | No replication cost; restore time fits the target |
 | 3 | Supporting services | 24 h | 72 h | CRR, or rebuild from infrastructure as code plus a data restore | Rebuild is often faster and cleaner than restoring a whole VM |
 | 4 | Dev and test | 24 h | 1 week | Rebuild from IaC | Data rarely needs recovery |
