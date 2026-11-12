@@ -1,7 +1,7 @@
 // Regional backup foundation (resource group scope, one deployment per region):
 //   - Recovery Services vault: GRS with Cross Region Restore, immutability
 //     (Unlocked; locking is a separate, deliberate step), always-on soft delete
-//   - Tier 1-4 Azure VM backup policies from config/backup-tiers.json
+//   - Platinum through Bronze Azure VM backup policies from config/backup-tiers.json
 //   - Resource-specific diagnostic logs to Log Analytics (the AddonAzureBackup*
 //     tables used by the alerts in cloud-observability-incident-response)
 //

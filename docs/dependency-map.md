@@ -54,5 +54,5 @@ Domain controllers are deliberately not in the recovery plan. Failing over a DC 
 |---|---|
 | A group-2 VM fails to boot | Retry from the *latest app-consistent* recovery point. If it still fails, restore from backup (CRR) and continue. Record the RTO impact. |
 | The app can't reach SQL | Check DNS (does the SQL name resolve to the new IP?), NSG rules in the secondary spoke, and the SQL listener |
-| The secondary region lacks capacity for a VM size | Fail over that VM to an alternate size (ASR target settings), or wait. That's why capacity reservations matter for Tier 1. |
+| The secondary region lacks capacity for a VM size | Fail over that VM to an alternate size (ASR target settings), or wait. That's why capacity reservations matter for Platinum. |
 | Key Vault unreachable | The application can't get secrets: check the private endpoint and DNS zone link in the secondary region |

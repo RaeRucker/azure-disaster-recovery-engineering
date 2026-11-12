@@ -15,7 +15,7 @@ Failback is a second, planned migration, not an undo button. Treat it with the s
 4. Validate with the same criteria as the exercise (V1-V5 in [DRX-01](../exercises/DRX-01-regional-failure/plan.md)).
 5. Switch DNS or Front Door back to the primary, using low TTLs set before the window.
 6. Commit, then reprotect again (primary → secondary), so the workload is protected for the next event.
-7. Check backup jobs in the primary-region vault resume, and run an on-demand backup for Tier 1 items.
+7. Check backup jobs in the primary-region vault resume, and run an on-demand backup for Platinum items.
 
 ## Common problems
 
